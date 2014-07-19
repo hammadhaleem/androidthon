@@ -1,4 +1,4 @@
-from flask import render_template, flash, jsonify
+from flask import render_template, flash, jsonify, url_for
 from app import app
 from flask.ext.admin import Admin
 from flask import g
@@ -17,6 +17,12 @@ def distance(x, y, k, m):
 
 
 @app.route('/')
+def main():
+    u1 = "http://code.jquery.com/jquery-2.1.0.min.js"
+    u2 = "http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v5.0.2.min.js"
+    return render_template('index.html', u1=u1, u2=u2)
+
+
 @app.route('/rack/<x>/<y>/<name>/')
 @app.route('/rack/<x>/<y>/<name>')
 def index(x=None, y=None, name=None):

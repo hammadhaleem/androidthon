@@ -1,11 +1,201 @@
-<!-- extend base layout -->
-{% extends "base.html" %}
 
-{% block content %}
-<h1>Hi, {{user.nickname}}!</h1>
-{% for post in posts %}
-<p>
-  {{post.author.nickname}} says: <b>{{post.body}}</b>
-</p>
-{% endfor %}
-{% endblock %}
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+
+    <script type="text/javascript" src="{{u1}}">
+    	
+
+    </script>
+
+  </head>
+  <body>
+
+  	<button onclick="createbox()" id = "createbox"> Create Rack</button>
+    <button onclick="createpath()" id = "createpath"> Create Path</button>
+  	<button onclick="save()" id = "createpath"> Save Layout</button>
+    
+  	
+<div id="container" style=" width: 578px;
+    background-image: url('grid.png'); background: #1E7188;"></div> 
+       <script src="{{u2}}"></script>
+    <script defer="defer">
+
+      var curbox = "";
+      var stage = new Kinetic.Stage({
+        container: 'container',
+        width: 578,
+        height: 500
+      });
+      var layer = new Kinetic.Layer();
+
+      var id = -1;          
+      
+
+      var dict = {}, path = 0;
+
+
+
+      function createpath () {
+        $("#createbox").hide();
+
+        path = 1;
+        for (var key in dict) {
+          dict[key].draggable(false);
+        };
+      }
+
+      var turn = "start";
+      var firstpoint = "";
+      var pointarr = [];
+      var cmnx,cmny;
+
+
+
+
+      function save(){
+        for(key in dict){
+          $.get("/rack/"+dict[key].getAbsolutePosition().x+"/"+dict[key].getAbsolutePosition().y+"/"+key+"/",function(data,status){
+          });
+        }
+
+        for (var i = 0; i < pointarr.length; i++) {
+          $.get("/path/"+pointarr[i]['x1']+"/"+pointarr[i]['y1']+"/"+pointarr[i]['x2']+"/"+pointarr[i]['y2']+"/",function(data,status){
+          });
+          pointarr[i]
+        };
+        
+      }
+
+
+
+
+      function checkpoint (x,y) {
+
+        if(pointarr.length == 0) return 12;
+
+        for (var i = 0; i < pointarr.length; i++) {
+        
+          if(pointarr[i]['x1']!=undefined && pointarr[i]['y1']!=undefined )
+          if((Math.abs(pointarr[i]['x1']-x) <= 5 && Math.abs(pointarr[i]['y1']-y)<=5)){
+            cmnx = pointarr[i]['x1'], cmny =  pointarr[i]['y1'];
+            return 2;
+          }
+
+          if(pointarr[i]['x2']!=undefined && pointarr[i]['y2']!=undefined )
+          if((Math.abs(pointarr[i]['x2']-x) <= 5 && Math.abs(pointarr[i]['y2']-y)<=5)){
+            cmnx = pointarr[i]['x2'], cmny =  pointarr[i]['y2'];
+            return 2;
+          }
+        
+        }
+
+        return -1;
+      }
+
+      $("#container").click(function(e) {
+
+        if(path == 0) return;
+        var offset = $(this).offset();
+
+        if(turn == "start"){
+
+            var x = e.clientX - offset.left;
+            var y = e.clientY - offset.top;
+
+           var status = checkpoint(x,y);
+
+           console.log(x+ "," + y + "," + status);
+           if(status==-1 ) return;
+           
+           if(status == 2){
+            x = cmnx;
+            y = cmny;
+           }
+
+           var circle = new Kinetic.Circle({
+              radius: 7,
+              x : x,
+              y : y,
+              stroke: 'red',
+              strokeWidth: 2
+           });  
+
+           pointarr.push({});
+           pointarr[pointarr.length-1]['x1'] = x;
+           pointarr[pointarr.length-1]['y1'] = y;
+
+          firstpoint = circle;
+          turn = "end";
+          layer.add(circle);
+          stage.add(layer);
+        
+        }else{
+        
+          var line = new Kinetic.Line({
+            points: [firstpoint.getAbsolutePosition().x, firstpoint.getAbsolutePosition().y, e.clientX - offset.left, e.clientY - offset.top],
+            stroke: 'red',
+            tension: 1
+          });
+
+          pointarr[pointarr.length-1]['x2'] = e.clientX - offset.left;
+          pointarr[pointarr.length-1]['y2'] = e.clientY - offset.top;
+
+          layer.add(line);
+          console.log(line);
+
+          firstpoint.destroy();
+          layer.draw();
+          turn = "start";
+        
+        }
+
+
+
+      });
+
+      
+      function createbox () {
+    		id = id + 1;
+
+      var imageObj = new Image();
+      imageObj.onload = function() {
+
+        var box = new Kinetic.Image({
+          x: 200,
+          y: 50,
+          image: imageObj,
+          width: 40,
+          height: 130,
+          draggable : true,
+          name : id
+        });
+
+  			curbox = box;
+    		console.log(box.name());
+
+  			dict[box.name()] = box;
+
+    		 layer.add(box);
+    		 stage.add(layer);
+    		 console.log(box);
+
+
+        };
+        imageObj.src = 'Guidage.png';
+
+    	}
+
+
+    </script>
+
+
+
+  </body>
+</html>      
