@@ -18,9 +18,11 @@ def distance(x, y, k, m):
 
 @app.route('/')
 def main():
-    u1 = "http://code.jquery.com/jquery-2.1.0.min.js"
-    u2 = "http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v5.0.2.min.js"
-    return render_template('index.html', u1=u1, u2=u2)
+    u1 = url_for('static', filename='js/jquery-2.1.0.min.js')
+    u2 = url_for('static', filename='js/kinetic-v5.0.2.min.js')
+    u3 = url_for('static', filename='js/grid.png')
+    u4 = url_for('static', filename='img/Guidage.png')
+    return render_template('index.html', u1=u1, u2=u2, u3=u3, u4=u4)
 
 
 @app.route('/rack/<x>/<y>/<name>/')
