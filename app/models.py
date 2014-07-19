@@ -50,7 +50,7 @@ class rack(db.Model):
         self.y = y
         selfname = name
         self.x1 = int(x) + 20
-        self.y1 = int(y) - 65
+        self.y1 = int(y) + 65
 
     def __unicode__(self):
         return 'Rack %r' % (self.id)
