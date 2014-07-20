@@ -9,21 +9,33 @@
       }
     </style>
 
-    <script type="text/javascript" src="{{u1}}">
+    <script type="text/javascript" src="{{u1}}">   </script>
     	
+<link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.min.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap-theme.min.css')}}">
 
-    </script>
+<!-- Latest compiled and minified JavaScript -->
+<script src="{{url_for('static', filename='css/bootstrap.min.js')}}"></script>
+ 
 
   </head>
   <body>
 
-  	<button onclick="createbox()" id = "createbox"> Create Rack</button>
-    <button onclick="createpath()" id = "createpath"> Create Path</button>
-  	<button onclick="save()" id = "createpath"> Save Layout</button>
-    
+
+    <center>
+      <br/>
+      <br/><hr/>
+    <button type="button" class="btn btn-danger" onclick="createbox()" id = "createbox"> Create Rack</button>
+    <button type="button" class="btn btn-success" onclick="createpath()" id = "createpath"> Create Path</button>
+    <button type="button" class="btn btn-default" onclick="save()" id = "createpath"> Save Layout</button>
+    <br/><br/>
+
+  <div id="container" style=" width: 578px;
+    background-image: url('grid.png'); background: #1E7188;"></div> 
+  
+</center>
+
   	
-<div id="container" style=" width: 578px;
-    background-image: url('{{u3}}'); background: #1E7188;"></div> 
        <script src="{{u2}}"></script>
     <script defer="defer">
 
@@ -60,16 +72,18 @@
 
 
       function save(){
-        for(key in dict){
-          $.get("/rack/"+dict[key].getAbsolutePosition().x+"/"+dict[key].getAbsolutePosition().y+"/"+key+"/",function(data,status){
-          });
-        }
 
         for (var i = 0; i < pointarr.length; i++) {
           $.get("/path/"+pointarr[i]['x1']+"/"+pointarr[i]['y1']+"/"+pointarr[i]['x2']+"/"+pointarr[i]['y2']+"/",function(data,status){
           });
           pointarr[i]
         };
+ 
+        for(key in dict){
+          $.get("/rack/"+dict[key].getAbsolutePosition().x+"/"+dict[key].getAbsolutePosition().y+"/"+key+"/",function(data,status){
+          });
+        }
+
         
       }
 
