@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Multi-page template</title>
+    <link rel="stylesheet" href="styles/jqm11.css" />
+    <script src="lib/jq171.js"></script>
+    <!--script src="lib/jq21.js"></script-->
+    <script src="lib/jqm11.js"></script>
+    <script src="lib/ember.js"></script>
+    <script src="lib/k502.js"></script>
+    <script type="text/javascript">
+
+    var responsed = {};
+    var response = {};
+    var fromx = 0;
+    var fromy = 0;
+    var tox = 0;
+    var toy = 0;
+    function setdestvalue(i) {
+        console.log(responsed);
+        tox = responsed.data[i].x;
+        toy = responsed.data[i].y;
+    }
+
+    function setsourcevalue(i) {
+        console.log(response);
+        fromx = response.data[i].x;
+        fromy = response.data[i].y;
+
+    }
+
+    function makemap() {
+        $( document ).ready(function() {
+          $.get("http://192.168.1.48:5000/data/"+fromx+","+fromy+"/"+tox+","+toy+"/",function (data){
+              //console.log(data);
+              $.get("http://192.168.1.48:5000/racks/",function (data1){
+            //console.log(data1);
+            draw(data1,data.path);
+              });
+      });
+
+        });
+        var cur = window.location;
+        window.location.href= cur+'#two';
+    }
+    function ondest(){
+        var a = document.getElementById('to').value;
+        $('#toi').html("");
+        $.get("http://192.168.1.48:5000/search/"+a+"/",function (data){
+
+      //console.log(data);
+      responsed = data;
+
+      for (var i = 0; i < responsed.data.length; i++) {
+          var temp = $('#toi').html();
+          var temp1 = "<a  href=\"#\" onclick=\"setdestvalue("+i+")\">"+responsed.data[i].name+"</a>";
+          $('#toi').html(temp + temp1 +"<br>");
+      }
+        });
+    }
+
+    function onsource(){
+        var a = document.getElementById('from').value;
+        $('#fromi').html("");
+        $.get("http://192.168.1.48:5000/search/"+a+"/",function (data){
+          //console.log(data);
+          response = data;
+          for (var i = 0; i < response.data.length; i++) {
+              var temp = $('#fromi').html();
+              var temp1 = "<a  href=\"#\" onclick=\"setsourcevalue("+i+")\">"+response.data[i].name+"</a>";
+              $('#fromi').html(temp + temp1 +"<br>");
+          }
+        });
+    }
+</script>
+</head>
+
+<body>
+
+<!-- Start of first page: #one -->
+<div data-role="page" id="one">
+
+  <div data-role="header">
+    <h1>Multi-page</h1>
+  </div><!-- /header -->
+
+  <div data-role="content" >
+    <h2>One</h2>
+    <input type='text' id='from' onkeyup='onsource()' placeholder="Objects you are near to.."/>
+    <div id="fromi" data-role="content"></div>
+
+    <input type="text" id="to" onkeyup = "ondest()" placeholder="What you wanna buy..."/>
+    <div id="toi" data-role="content"></div>
+
+    <!--second page -->
+    <div data-role="page" id="details-page">
+        <div data-role="header" data-theme="b"><a href="#" data-rel="back" data-role="button">Go back</a>
+
+             <h1>Employee Details</h1>
+
+        </div>
+        <div data-role="content"></div>
+    </div>
+    <!--second page -->
+    <div data-role="page" id="details-page">
+    <div data-role="header" data-theme="b"><a href="#" data-rel="back" data-role="button">Go back</a>
+
+         <h1>Employee Details</h1>
+
+    </div>
+    <div data-role="content"></div>
+</div>
+<!--second page -->
+<div data-role="page" id="details-page">
+    <div data-role="header" data-theme="b"><a href="#" data-rel="back" data-role="button">Go back</a>
+
+         <h1>Employee Details</h1>
+
+    </div>
+    <div data-role="content"></div>
+</div>
+  </div><!-- /content -->
+
+  <div data-role="footer" data-theme="d" style="text-align:center">
+    <p><button  data-role="button" onclick='makemap()'>Shop Layout</a></p>
+  </div><!-- /footer -->
+</div><!-- /page one -->
+
+
+<!-- Start of second page: #two -->
+<div data-role="page" id="two" data-theme="a">
+
+  <div data-role="header">
+    <h1>Shop Layout</h1>
+  </div><!-- /header -->
+  <div data-role="content" data-theme="a">
+
+<script type="text/javascript">
+
+function draw(rack, path){
+
+     for(var key = 0; key < rack.items.length ; key++){
+      createbox(rack.items[key]);
+     }
+
+    for(var key = 0; key < path.length - 1 ; key++){
+  createline(path[key],path[key+1]);
+    }
+}
+</script>
+
+<div id="container" style=" width: 578px; background-image: url('grid.png'); background: #1E7188;"></div>
+    <script defer="defer">
+
+      var curbox = "";
+      var stage = new Kinetic.Stage({
+        container: 'container',
+        width: 578,
+        height: 500
+      });
+      var layer = new Kinetic.Layer();
+
+      var id = -1;
+
+      function createbox (coord)
+      {
+        var x = parseInt(coord.x);
+        var y = parseInt(coord.y);
+        id = id + 1;
+        var imageObj = new Image();
+        imageObj.onload = function() {
+            var box = new Kinetic.Image({
+          name: 3,
+          x : x,
+          y : y,
+          image: imageObj,
+          width: 39,
+          height: 130,
+          });
+          layer.add(box);
+          stage.add(layer);
+        };
+        imageObj.src = 'images/Guidage.png';
+      }
+
+      function createline(coord1, coord2){
+          coord1 = coord1.split(",");
+          var x1 = parseInt(coord1[0]);
+          var y1 = parseInt(coord1[1]);
+          coord2 = coord2.split(",");
+          var x2 = parseInt(coord2[0]);
+          var y2 = parseInt(coord2[1]);
+
+          id = -1;
+          id = id + 1;
+
+          var line = new Kinetic.Line({
+              points: [x1, y1, x2, y2],
+              stroke: 'red',
+              tension: 1
+          });
+          console.log(line);
+          layer.add(line);
+          stage.add(layer);
+      }
+    </script>
+
+  </div><!-- /content -->
+  <div data-role="footer" data-theme='d' style="text-align:center">
+
+<p><a href="#one" data-role="button">Search</a></p>
+  </div><!-- /footer -->
+</div><!-- /page two -->
+</body>
+</html>
